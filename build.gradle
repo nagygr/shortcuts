@@ -1,0 +1,56 @@
+plugins {
+	id 'com.github.johnrengelman.shadow' version '6.1.0'
+	id 'java'
+	id 'application'
+}
+
+sourceCompatibility = 1.15
+targetCompatibility = 1.15
+
+def mainClassFQN = 'com.h119.shortcuts.Shortcuts'
+def projectName = 'ShortcutsGUI'
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+	implementation group: 'com.formdev', name: 'flatlaf', version: '0.39'
+	implementation group: 'org.json', name: 'json', version: '20200518'
+}
+
+application {
+	// This way of setting the class name is deprecated in Gradle but shadowJar requires
+	// it at the moment:
+	mainClassName = mainClassFQN
+
+	// This is the new way of setting it but shadowJar doesn't recognize it right now:
+	// mainClass.set(mainClassFQN)
+
+	// The issue ticket is for this problem: https://github.com/johnrengelman/shadow/issues/609
+}
+
+task makeJar(type: Jar) {
+	manifest {
+		attributes 'Description': projectName
+	}
+}
+
+shadowJar {
+ 	archiveBaseName.set(projectName)
+	archiveClassifier.set('')
+	archiveVersion.set('')
+	manifest {
+		inheritFrom project.tasks.makeJar.manifest
+	}
+}
+
+tasks.withType(JavaCompile) {
+	// The way to allow a single warning type:
+    // options.compilerArgs << '-Xlint:unchecked'
+
+	// This allows all warning types:
+    options.compilerArgs << '-Xlint'
+    options.deprecation = true
+}
