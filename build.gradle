@@ -8,7 +8,7 @@ sourceCompatibility = 1.15
 targetCompatibility = 1.15
 
 def mainClassFQN = 'com.h119.shortcuts.Shortcuts'
-def projectName = 'ShortcutsGUI'
+def projectName = 'shortcuts'
 
 repositories {
 	mavenCentral()
@@ -28,7 +28,7 @@ application {
 	// This is the new way of setting it but shadowJar doesn't recognize it right now:
 	// mainClass.set(mainClassFQN)
 
-	// The issue ticket is for this problem: https://github.com/johnrengelman/shadow/issues/609
+	// The issue ticket for this problem: https://github.com/johnrengelman/shadow/issues/609
 }
 
 task makeJar(type: Jar) {
@@ -38,7 +38,7 @@ task makeJar(type: Jar) {
 }
 
 shadowJar {
- 	archiveBaseName.set(projectName)
+	archiveBaseName.set(projectName)
 	archiveClassifier.set('')
 	archiveVersion.set('')
 	manifest {
@@ -48,9 +48,9 @@ shadowJar {
 
 tasks.withType(JavaCompile) {
 	// The way to allow a single warning type:
-    // options.compilerArgs << '-Xlint:unchecked'
+	// options.compilerArgs << '-Xlint:unchecked'
 
 	// This allows all warning types:
-    options.compilerArgs << '-Xlint'
-    options.deprecation = true
+	options.compilerArgs << '-Xlint'
+	options.deprecation = true
 }
