@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 
 public class Shortcuts {
 	private String home;
@@ -117,45 +118,74 @@ public class Shortcuts {
 
 	private List<Application> applications;
 
-	public Shortcuts() throws IOException {
-		applications = new ArrayList<>();
-
-		home = System.getProperty("user.home");
-        Path configFile = Paths.get(home, ".config", "shortcuts", "shortcuts.conf");
-
-		if (!Files.exists(configFile)) {
-			System.out.format("Creating default config file (%s)\n", configFile);
-			Files.createDirectories(Paths.get(home, ".config", "shortcuts"));
-			Files.write(configFile, defaultConfig.getBytes());
+		/*
+		if (illegalConfigFile != null) {
+			shortcutsText.setText(
+				String.format(
+					"The config file is illegal:<br>%s",
+					escapeHTML(illegalConfigFile.toString())
+				)
+			);
 		}
+		else {
+		*/
 
-        String configuration = Files.readString(configFile);
-
-		JSONObject root = new JSONObject(configuration);
-
-		JSONArray configs = root.getJSONArray("applications");
-		int configsLength = configs.length();
-
-		for (int i = 0; i < configsLength; ++i) {
-			JSONObject configObject = configs.getJSONObject(i);
-			applications.add(new Application(
-				configObject.getString("name"),
-				configObject.getString("config"),
-				configObject.getString("syntax")
-			));
-		}
-
-		applicationBox = new JComboBox<>();
-		
-		for (var application: applications) {
-			applicationBox.addItem(application);
-		}
-
+	public Shortcuts() {
 		shortcutsText = new JEditorPane();
 		shortcutsText.setContentType("text/html");
+
 		scroll = new JScrollPane(shortcutsText);
 
-		showShortcuts((Application)applicationBox.getSelectedItem());
+		applicationBox = new JComboBox<>();
+
+		try {
+			applications = new ArrayList<>();
+			home = System.getProperty("user.home");
+			Path configFile = Paths.get(home, ".config", "shortcuts", "shortcuts.conf");
+
+			if (!Files.exists(configFile)) {
+				System.out.format("Creating default config file (%s)\n", configFile);
+				Files.createDirectories(Paths.get(home, ".config", "shortcuts"));
+				Files.write(configFile, defaultConfig.getBytes());
+			}
+
+			String configuration = Files.readString(configFile);
+			JSONException illegalConfigFile = null;
+
+			JSONObject root = new JSONObject(configuration);
+
+			JSONArray configs = root.getJSONArray("applications");
+			int configsLength = configs.length();
+
+			for (int i = 0; i < configsLength; ++i) {
+				JSONObject configObject = configs.getJSONObject(i);
+				applications.add(new Application(
+					configObject.getString("name"),
+					configObject.getString("config"),
+					configObject.getString("syntax")
+				));
+			}
+			
+			for (var application: applications) {
+				applicationBox.addItem(application);
+			}
+
+			showShortcuts((Application)applicationBox.getSelectedItem());
+		}
+		catch (IOException | JSONException e) {
+			String source;
+
+			if (e instanceof IOException) {
+				source = "while accessing the config file";
+			}
+			else {
+				source = "while parsing the config file";
+			}
+
+			shortcutsText.setText(
+				printException(String.format("An error has occured %s", source), e)
+			);
+		}
 
 		JFrame frame = new JFrame("Shortcuts");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -198,7 +228,10 @@ public class Shortcuts {
 
 	private void showShortcuts(Application currentApplication) {
 		Path applicationConfig;
-		if (currentApplication.getConfig().startsWith("/") || (currentApplication.getConfig().length() > 1 && currentApplication.getConfig().charAt(1) == ':'))
+		if (
+			currentApplication.getConfig().startsWith("/") || 
+			(currentApplication.getConfig().length() > 1 && currentApplication.getConfig().charAt(1) == ':')
+		)
 			applicationConfig = Path.of(currentApplication.getConfig());
 		else 
 			applicationConfig = Paths.get(home, currentApplication.getConfig());
@@ -237,9 +270,20 @@ public class Shortcuts {
 			scroll.getVerticalScrollBar().setValue(0);
 		}
 		catch (IOException e) {
-			shortcutsText.setText(String.format("Error while parsing the application config file: %s", e));
+			shortcutsText.setText(
+				printException("Error while parsing the application config file", e)
+			);
 		}
 
+	}
+
+	private static String printException(String message, Exception exception) {
+	return
+		String.format(
+			"<b>%s:</b><br><i>%s</i>",
+			escapeHTML(message),
+			escapeHTML(exception.toString())
+		);
 	}
 
 	private static String escapeHTML(String s) {
@@ -274,7 +318,7 @@ public class Shortcuts {
 		return builder.toString();
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		if (args.length == 1 && (args[0].startsWith("-h") || args[0].startsWith("--help"))) {
 			System.out.format("%s\n\nThe default config:\n\n%s\n", help, defaultConfig);
 			return;
