@@ -33,8 +33,6 @@ public class Shortcuts {
 	private JScrollPane scroll;
 
 	private static final int MARGIN = 10;
-	private static final int INITIAL_TEXTWIDTH = 20;
-	private static final int INITIAL_TEXTHEIGHT = 70;
 
 	public static String defaultConfig;
 	public static String help;
