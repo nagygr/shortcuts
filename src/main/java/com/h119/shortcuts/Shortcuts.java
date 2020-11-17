@@ -118,18 +118,6 @@ public class Shortcuts {
 
 	private List<Application> applications;
 
-		/*
-		if (illegalConfigFile != null) {
-			shortcutsText.setText(
-				String.format(
-					"The config file is illegal:<br>%s",
-					escapeHTML(illegalConfigFile.toString())
-				)
-			);
-		}
-		else {
-		*/
-
 	public Shortcuts() {
 		shortcutsText = new JEditorPane();
 		shortcutsText.setContentType("text/html");
