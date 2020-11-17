@@ -23,13 +23,12 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
- 
 
 public class Shortcuts {
 	private String home;
 
 	private JComboBox<Application> applicationBox;
-	private JTextArea shortcutsText;
+	private JEditorPane shortcutsText;
 	private JScrollPane scroll;
 
 	private static final int MARGIN = 10;
@@ -152,7 +151,8 @@ public class Shortcuts {
 			applicationBox.addItem(application);
 		}
 
-		shortcutsText = new JTextArea(INITIAL_TEXTWIDTH, INITIAL_TEXTHEIGHT);
+		shortcutsText = new JEditorPane();
+		shortcutsText.setContentType("text/html");
 		scroll = new JScrollPane(shortcutsText);
 
 		showShortcuts((Application)applicationBox.getSelectedItem());
@@ -209,6 +209,8 @@ public class Shortcuts {
 		try (Stream<String> stream = Files.lines(applicationConfig)) {
 			var shortcutsBuilder = new StringBuilder();
 
+			shortcutsBuilder.append("<table>");
+
 			stream
 				.map(
 					line -> {
@@ -217,9 +219,9 @@ public class Shortcuts {
 
 						return Optional.<String>of(
 							String.format(
-								"%s: %s\n",
-								matcher.group(1),
-								matcher.group(2).trim()
+								"<tr><td><b>%s:</b></td><td><i>%s</i></td></tr>\n",
+								escapeHTML(matcher.group(1)),
+								escapeHTML(matcher.group(2).trim())
 							)
 						);
 					}
@@ -227,6 +229,8 @@ public class Shortcuts {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.forEach(shortcutsBuilder::append);
+
+			shortcutsBuilder.append("</table>");
 
 			shortcutsText.setText(shortcutsBuilder.toString());
 			scroll.getHorizontalScrollBar().setValue(0);
@@ -236,6 +240,38 @@ public class Shortcuts {
 			shortcutsText.setText(String.format("Error while parsing the application config file: %s", e));
 		}
 
+	}
+
+	private static String escapeHTML(String s) {
+		StringBuilder builder = new StringBuilder();
+		boolean previousWasASpace = false;
+		for( char c : s.toCharArray() ) {
+			if( c == ' ' ) {
+				if( previousWasASpace ) {
+					builder.append("&nbsp;");
+					previousWasASpace = false;
+					continue;
+				}
+				previousWasASpace = true;
+			} else {
+				previousWasASpace = false;
+			}
+			switch(c) {
+				case '<': builder.append("&lt;"); break;
+				case '>': builder.append("&gt;"); break;
+				case '&': builder.append("&amp;"); break;
+				case '"': builder.append("&quot;"); break;
+				case '\n': builder.append("<br>"); break;
+				case '\t': builder.append("&nbsp; &nbsp; &nbsp;"); break;
+				default:
+					if( c < 128 ) {
+						builder.append(c);
+					} else {
+						builder.append("&#").append((int)c).append(";");
+					}
+			}
+		}
+		return builder.toString();
 	}
 
 	public static void main(String[] args) throws IOException {
