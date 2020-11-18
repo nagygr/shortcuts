@@ -317,12 +317,7 @@ public class Shortcuts {
 			return;
 		}
 
-		try {
-				UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
-		}
-		catch (UnsupportedLookAndFeelException flatlafException) {
-			System.out.format("Couldn't set flatlaf: %s", flatlafException);
-		}
+		com.github.weisj.darklaf.LafManager.install(new com.github.weisj.darklaf.theme.DarculaTheme());
 
 		Shortcuts shortcuts = new Shortcuts();
 	}

@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'com.formdev', name: 'flatlaf', version: '0.39'
+	implementation group: 'com.github.weisj', name: 'darklaf-core', version: '2.5.2'
 	implementation group: 'org.json', name: 'json', version: '20200518'
 }
 
