@@ -1,5 +1,4 @@
 plugins {
-	id 'com.github.johnrengelman.shadow' version '6.1.0'
 	id 'java'
 	id 'application'
 }
@@ -21,36 +20,28 @@ dependencies {
 }
 
 application {
-	// This way of setting the class name is deprecated in Gradle but shadowJar requires
-	// it at the moment:
-	mainClassName = mainClassFQN
-
-	// This is the new way of setting it but shadowJar doesn't recognize it right now:
-	// mainClass.set(mainClassFQN)
-
-	// The issue ticket for this problem: https://github.com/johnrengelman/shadow/issues/609
+	mainClass.set(mainClassFQN)
 }
 
-task makeJar(type: Jar) {
+task fatJar(type: Jar) {
 	manifest {
+		attributes 'Main-Class': mainClassFQN
 		attributes 'Description': projectName
 	}
-}
-
-shadowJar {
-	archiveBaseName.set(projectName)
-	archiveClassifier.set('')
-	archiveVersion.set('')
-	manifest {
-		inheritFrom project.tasks.makeJar.manifest
+	archiveBaseName = projectName
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	from {
+		configurations.runtimeClasspath
+		.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
 	}
-}
+	with jar
 
-tasks.withType(JavaCompile) {
-	// The way to allow a single warning type:
-	// options.compilerArgs << '-Xlint:unchecked'
-
-	// This allows all warning types:
-	options.compilerArgs << '-Xlint'
-	options.deprecation = true
+	exclude(
+		'META-INF/*.DSA',
+		'META-INF/*.SF',
+		'META-INF/*.RSA'
+	)
+	with jar
 }
