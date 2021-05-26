@@ -46,3 +46,26 @@ The default configuration:
 
 The application can be run with the command line argument `-h` or `--help` to get this help
 printed to the standard output.
+
+## Installation on a Linux desktop
+
+-	copy the JAR file (created by `gradle fatJar` to `build/lib/shortcuts.jar`)
+	to somewhere in your home folder together with `shortcuts.png` that can be
+	found here: `src/main/resources/shortcuts.png`
+-	go to `~/.local/share/applications`
+-	create the following file: `shortcuts.desktop`
+-	add the following lines to it:
+
+	```
+	[Desktop Entry]
+	Type=Application
+	Name=Shortcuts
+	Comment=Keyboard shortcuts
+	Exec=java -jar <path-to-shortcuts>/shortcuts.jar
+	Icon=<path-to-shortcuts>/shortcuts.png
+	Terminal=false
+	Categories=Utility;
+	```
+
+	where `<path-to-shortcuts>` should be substituted with the absolute path to
+	the JAR file and the PNG image
