@@ -54,7 +54,7 @@ public class Shortcuts {
 					{
 						"name": "vifm",
 						"config": ".config/vifm/vifmrc",
-						"syntax": "nnoremap ([a-zA-Z0-9<>,]+) (.*)"
+						"syntax": "nnoremap ([a-zA-Z0-9<>,-]+) (.*)"
 					}
 				]
 			}
