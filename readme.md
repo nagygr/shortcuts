@@ -49,7 +49,7 @@ printed to the standard output.
 
 ## Installation on a Linux desktop
 
--	copy the JAR file (created by `gradle fatJar` to `build/lib/shortcuts.jar`)
+-	copy the JAR file (created by `gradle fatJar` to `build/libs/shortcuts.jar`)
 	to somewhere in your home folder together with `shortcuts.png` that can be
 	found here: `src/main/resources/shortcuts.png`
 -	go to `~/.local/share/applications`
