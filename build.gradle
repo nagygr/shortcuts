@@ -11,11 +11,11 @@ def projectName = 'shortcuts'
 
 repositories {
 	mavenCentral()
-	jcenter()
 }
 
 dependencies {
-	implementation group: 'com.github.weisj', name: 'darklaf-core', version: '2.5.2'
+	// implementation 'com.github.weisj:darklaf-core:2.6.1'
+	implementation 'com.formdev:flatlaf:0.39'
 	implementation group: 'org.json', name: 'json', version: '20200518'
 }
 

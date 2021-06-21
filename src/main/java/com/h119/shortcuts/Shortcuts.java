@@ -317,7 +317,15 @@ public class Shortcuts {
 			return;
 		}
 
-		com.github.weisj.darklaf.LafManager.install(new com.github.weisj.darklaf.theme.DarculaTheme());
+		// Darklaf stopped working from Java 16 and up due to an illegal access.
+		// com.github.weisj.darklaf.LafManager.install(new com.github.weisj.darklaf.theme.DarculaTheme());
+
+		try {
+				UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
+		}
+		catch (UnsupportedLookAndFeelException flatlafException) {
+			System.out.format("Couldn't set flatlaf: %s", flatlafException);
+		}
 
 		Shortcuts shortcuts = new Shortcuts();
 	}
